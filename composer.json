@@ -1,0 +1,35 @@
+{
+    "name": "terminus-plugin-project/terminus-site-mount-plugin",
+    "description": "Site Mount - A Terminus plugin to mount Pantheon sites.",
+    "homepage": "https://github.com/terminus-plugin-project/terminus-site-mount-plugin",
+    "authors": [
+        {
+            "name": "Ed Reel",
+            "email": "edreel@gmail.com",
+            "homepage": "https://github.com/uberhacker",
+            "role": "Developer"
+        }
+    ],
+    "type": "terminus-plugin",
+    "keywords": [
+        "pantheon",
+        "terminus",
+        "mount",
+        "plugin"
+    ],
+    "support": {
+        "issues": "https://github.com/terminus-plugin-project/terminus-site-mount-plugin/issues"
+    },
+    "license": "MIT",
+    "require": {
+        "php": "^5.5 || ^7.0"
+    },
+    "autoload": {
+        "psr-4": { "TerminusPluginProject\\TerminusSiteMount\\": "src" }
+    },
+    "extra": {
+        "terminus": {
+            "compatible-version": "^1"
+        }
+    }
+}
