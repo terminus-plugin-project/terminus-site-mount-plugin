@@ -10,7 +10,7 @@ use Pantheon\Terminus\Collections\Sites;
 
 /**
  * Class SiteMountCommand
- * Mounts the site via SSHFS
+ * Mounts/unmounts the site environment via SSHFS.
  */
 class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
 {
@@ -18,7 +18,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
     use SiteAwareTrait;
 
     /**
-     * Mounts the site via SSHFS
+     * Mounts the site environment via SSHFS.
      *
      * @authorize
      *
@@ -38,6 +38,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
             throw new TerminusNotFoundException($message);
         }
 
+        // Determine connection information.
         list($site, $env) = $this->getSiteEnv($site_env);
         $connection_info = $env->sftpConnectionInfo();
         $user = $connection_info['username'];
@@ -62,12 +63,13 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
             $this->log()->notice($message);
         }
 
+        // Output mounted files location message.
         $message = "Type 'cd {$mount}' to view the mounted files.";
         $this->log()->notice($message);
     }
 
     /**
-     * Unmounts the site
+     * Unmounts the site environment.
      *
      * @authorize
      *
@@ -87,16 +89,16 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
             throw new TerminusNotFoundException($message);
         }
 
+        // Determine connection information.
         list($site, $env) = $this->getSiteEnv($site_env);
         $connection_info = $env->sftpConnectionInfo();
-        $user = $connection_info['username'];
         $host = $connection_info['host'];
-        $port = $connection_info['port'];
 
         // Determine the mount location.
         $windows = (php_uname('s') == 'Windows NT');
         $mount = $windows ? "\\Temp\\{$host}" : "/tmp/{$host}";
 
+        // Cannot unmount inside a mounted directory.
         exec('pwd', $directory);
         $pwd = array_pop($directory);
         if (strpos($pwd, $mount) !== false) {
