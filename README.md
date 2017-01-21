@@ -1,4 +1,4 @@
-# Site Mount
+# Terminus Site Mount Plugin
 
 Terminus plugin to mount Pantheon sites.
 
@@ -31,5 +31,5 @@ composer create-project -d ~/.terminus/plugins terminus-plugin-project/terminus-
 
 This plugin requires no configuration to use.
 
-## Help
+## Help:
 Run `terminus help site:mount` for help.
