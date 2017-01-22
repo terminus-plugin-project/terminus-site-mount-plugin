@@ -2,6 +2,8 @@
 
 Terminus plugin to mount Pantheon sites.
 
+The site environment will be mounted in `/tmp/site-name.dev`.
+
 ## Examples:
 Mount the site environment awesome-site.dev.
 ```

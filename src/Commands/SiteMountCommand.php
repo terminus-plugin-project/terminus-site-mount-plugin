@@ -39,7 +39,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         }
 
         // Determine connection information.
-        list($site, $env) = $this->getSiteEnv($site_env);
+        list(, $env) = $this->getSiteEnv($site_env);
         $connection_info = $env->sftpConnectionInfo();
         $user = $connection_info['username'];
         $host = $connection_info['host'];
@@ -47,7 +47,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
 
         // Determine the mount location.
         $windows = (php_uname('s') == 'Windows NT');
-        $mount = $windows ? "\\Temp\\{$host}" : "/tmp/{$host}";
+        $mount = $windows ? "\\Temp\\{$site_env}" : "/tmp/{$site_env}";
 
         // Create the mount directory if it doesn't exist.
         $command = "if [ ! -d {$mount} ]; then mkdir {$mount}; fi";
@@ -89,14 +89,16 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
             throw new TerminusNotFoundException($message);
         }
 
-        // Determine connection information.
-        list($site, $env) = $this->getSiteEnv($site_env);
-        $connection_info = $env->sftpConnectionInfo();
-        $host = $connection_info['host'];
-
         // Determine the mount location.
         $windows = (php_uname('s') == 'Windows NT');
-        $mount = $windows ? "\\Temp\\{$host}" : "/tmp/{$host}";
+        $mount = $windows ? "\\Temp\\{$site_env}" : "/tmp/{$site_env}";
+
+        // Check if the directory exists.
+        if (!file_exists($mount)) {
+            $message = "Site environment {$site_env} not mounted.";
+            $this->log()->notice($message);
+            return;
+        }
 
         // Cannot unmount inside a mounted directory.
         exec('pwd', $directory);
@@ -108,6 +110,13 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
 
         // Execute the umount command.
         $command = "sudo umount {$mount}";
+        exec($command, $messages);
+        foreach ($messages as $message) {
+            $this->log()->notice($message);
+        }
+
+        // Remove mount directory.
+        $command = "rmdir {$mount}";
         exec($command, $messages);
         foreach ($messages as $message) {
             $this->log()->notice($message);
