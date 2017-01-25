@@ -8,6 +8,20 @@ use Pantheon\Terminus\Site\SiteAwareInterface;
 use Pantheon\Terminus\Site\SiteAwareTrait;
 use Pantheon\Terminus\Collections\Sites;
 
+// Get HOME directory.
+define('HOME', getenv('HOME'));
+
+// Is the operating system is MS Windows?
+$windows = (php_uname('s') == 'Windows NT');
+
+// Determine the directory separator.
+$slash = $windows ? '\\' : '/';
+define('SLASH', $slash);
+
+// Determine the default mount location.
+$temp_dir = $windows ? '\\Temp' : '/tmp';
+define('TEMP_DIR', $temp_dir);
+
 /**
  * Class SiteMountCommand
  * Mounts/unmounts the site environment via SSHFS.
@@ -16,17 +30,6 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
 {
 
     use SiteAwareTrait;
-
-    // Is the operating system is MS Windows?
-    $windows = (php_uname('s') == 'Windows NT');
-
-    // Determine the directory separator.
-    $slash = $windows ? '\\' : '/';
-    define('SLASH', $slash);
-
-    // Determine the default mount location.
-    $temp_dir = $windows ? '\\Temp' : '/tmp';
-    define('TEMP_DIR', $temp_dir);
 
     /**
      * Mounts the site environment via SSHFS.
@@ -58,7 +61,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         $port = $connection_info['port'];
 
         // Determine the mount location.
-        $mount = $options['dir'] . SLASH . $site_env;
+        $mount = str_replace('~', HOME, $options['dir']) . SLASH . $site_env;
 
         // Create the mount directory if it doesn't exist.
         $command = "if [ ! -d {$mount} ]; then mkdir {$mount}; fi";
@@ -102,7 +105,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         }
 
         // Determine the mount location.
-        $mount = $options['dir'] . SLASH . $site_env;
+        $mount = str_replace('~', HOME, $options['dir']) . SLASH . $site_env;
 
         // Check if the directory exists.
         if (!file_exists($mount)) {
