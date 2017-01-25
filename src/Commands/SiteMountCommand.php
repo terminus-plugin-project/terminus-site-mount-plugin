@@ -17,6 +17,17 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
 
     use SiteAwareTrait;
 
+    // Is the operating system is MS Windows?
+    $windows = (php_uname('s') == 'Windows NT');
+
+    // Determine the directory separator.
+    $slash = $windows ? '\\' : '/';
+    define('SLASH', $slash);
+
+    // Determine the default mount location.
+    $temp_dir = $windows ? '\\Temp' : '/tmp';
+    define('TEMP_DIR', $temp_dir);
+
     /**
      * Mounts the site environment via SSHFS.
      *
@@ -24,17 +35,18 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
      *
      * @command site:mount
      * @aliases mount
-
+     *
      * @param string $site_env Site & environment in the format `site-name.env`
+     * @option dir Directory to mount
      *
      * @usage terminus site:mount <site>.<env>
      */
-    public function mount($site_env = '')
+    public function mount($site_env = '', $options = ['dir' => TEMP_DIR])
     {
         $this->checkRequirements();
 
         if (empty($site_env)) {
-            $message = "Usage: terminus site:mount|mount <site-name.env>";
+            $message = "Usage: terminus site:mount|mount <site-name.env> --dir=<directory>";
             throw new TerminusNotFoundException($message);
         }
 
@@ -46,8 +58,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         $port = $connection_info['port'];
 
         // Determine the mount location.
-        $windows = (php_uname('s') == 'Windows NT');
-        $mount = $windows ? "\\Temp\\{$site_env}" : "/tmp/{$site_env}";
+        $mount = $options['dir'] . SLASH . $site_env;
 
         // Create the mount directory if it doesn't exist.
         $command = "if [ ! -d {$mount} ]; then mkdir {$mount}; fi";
@@ -77,21 +88,21 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
      * @aliases site:unmount umount unmount
      *
      * @param string $site_env Site & environment in the format `site-name.env`
+     * @option dir Directory to unmount
      *
      * @usage terminus site:umount <site>.<env>
      */
-    public function unmount($site_env = '')
+    public function unmount($site_env = '', $options = ['dir' => TEMP_DIR])
     {
         $this->checkRequirements();
 
         if (empty($site_env)) {
-            $message = "Usage: terminus site:umount|site:unmount|umount|unmount <site-name.env>";
+            $message = "Usage: terminus site:umount|site:unmount|umount|unmount <site-name.env> --dir=<directory>";
             throw new TerminusNotFoundException($message);
         }
 
         // Determine the mount location.
-        $windows = (php_uname('s') == 'Windows NT');
-        $mount = $windows ? "\\Temp\\{$site_env}" : "/tmp/{$site_env}";
+        $mount = $options['dir'] . SLASH . $site_env;
 
         // Check if the directory exists.
         if (!file_exists($mount)) {
