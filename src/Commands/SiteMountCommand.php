@@ -20,7 +20,7 @@ $slash = WINDOWS ? '\\' : '/';
 define('SLASH', $slash);
 
 // Determine the default mount location.
-$temp_dir = $windows ? '\\Temp' : '/tmp';
+$temp_dir = WINDOWS ? '\\Temp' : '/tmp';
 define('TEMP_DIR', $temp_dir);
 
 /**
@@ -72,7 +72,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         }
 
         // Execute the sshfs command.
-        $command = "sshfs -o Port={$port} {$user}@{$host}:. {$mount}";
+        $command = "sudo sshfs -o Port={$port} -o allow_other {$user}@{$host}:. {$mount}";
         exec($command, $messages);
         foreach ($messages as $message) {
             $this->log()->notice($message);
