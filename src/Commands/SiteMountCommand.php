@@ -151,7 +151,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         $test_command = WINDOWS ? 'where' : 'command -v';
         $file = popen("$test_command $command", 'r');
         $result = fgets($file, 255);
-        return $windows ? !preg_match('#Could not find files#', $result) : !empty($result);
+        return WINDOWS ? !preg_match('#Could not find files#', $result) : !empty($result);
     }
 
     /**
