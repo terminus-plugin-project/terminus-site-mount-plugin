@@ -15,10 +15,6 @@ define('HOME', getenv('HOME'));
 $windows = (php_uname('s') == 'Windows NT');
 define('WINDOWS', $windows);
 
-// Determine the directory separator.
-$slash = WINDOWS ? '\\' : '/';
-define('SLASH', $slash);
-
 // Determine the default mount location.
 $temp_dir = WINDOWS ? '\\Temp' : '/tmp';
 define('TEMP_DIR', $temp_dir);
@@ -62,13 +58,19 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         $port = $connection_info['port'];
 
         // Determine the mount location.
-        $mount = str_replace('~', HOME, $options['dir']) . SLASH . $site_env;
+        $mount = str_replace('~', HOME, $options['dir']) . DIRECTORY_SEPARATOR . $site_env;
 
         // Create the mount directory if it doesn't exist.
-        $command = "if [ ! -d {$mount} ]; then mkdir {$mount}; fi";
+        $command = "if [ ! -d \"{$mount}\" ]; then mkdir \"{$mount}\"; fi";
         exec($command, $messages);
         foreach ($messages as $message) {
             $this->log()->notice($message);
+        }
+
+        // Abort if unable to create the mount directory.
+        if (!file_exists("{$mount}")) {
+            $message = "Unable to mount in '{$mount}'.";
+            throw new TerminusNotFoundException($message);
         }
 
         // Execute the sshfs command.
@@ -79,7 +81,10 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         }
 
         // Output mounted files location message.
-        $message = "Type 'cd {$mount}' to view the mounted files.";
+        $unmount = 'terminus umount ';
+        $temp_mount_dir = TEMP_DIR . DIRECTORY_SEPARATOR . $site_env;
+        $unmount .= ($mount == $temp_mount_dir) ? $site_env : $site_env . ' --dir=' . $options['dir'];
+        $message = "Site mounted in '{$mount}' successfully.  Unmount with '{$unmount}'.";
         $this->log()->notice($message);
     }
 
@@ -106,10 +111,10 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         }
 
         // Determine the mount location.
-        $mount = str_replace('~', HOME, $options['dir']) . SLASH . $site_env;
+        $mount = str_replace('~', HOME, $options['dir']) . DIRECTORY_SEPARATOR . $site_env;
 
         // Check if the directory exists.
-        if (!file_exists($mount)) {
+        if (!file_exists("{$mount}")) {
             $message = "Site environment {$site_env} not mounted.";
             $this->log()->notice($message);
             return;
