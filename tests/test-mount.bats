@@ -8,6 +8,6 @@
 
 @test "output of plugin 'mount' command" {
   run terminus site:mount $TERMINUS_SITE.dev
-  [[ "$output" == *"[notice] Site mounted in '/tmp/{$TERMINUS_SITE}.dev' successfully."* ]]
+  [[ "$output" == *"[notice] Site mounted in '/tmp/${TERMINUS_SITE}.dev' successfully."* ]]
   [ "$status" -eq 0 ]
 }
