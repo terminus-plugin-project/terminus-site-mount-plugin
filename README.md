@@ -37,5 +37,15 @@ composer create-project -d ~/.terminus/plugins terminus-plugin-project/terminus-
 
 This plugin requires no configuration to use.
 
+## Testing:
+
+Replace `my-test-site` with the site you want to test:
+```
+TERMINUS_SITE=my-test-site
+cd ~/.terminus/plugins/terminus-site-mount-plugin
+composer install
+composer test
+```
+
 ## Help:
 Run `terminus help site:mount` for help.
