@@ -3,13 +3,13 @@
 [![CircleCI](https://circleci.com/gh/terminus-plugin-project/terminus-site-mount-plugin.svg?style=shield)](https://circleci.com/gh/terminus-plugin-project/terminus-site-mount-plugin)
 [![Terminus v1.x Compatible](https://img.shields.io/badge/terminus-v1.x-green.svg)](https://github.com/terminus-plugin-project/terminus-site-mount-plugin/tree/1.x)
 
-Terminus plugin to mount Pantheon sites.
+Terminus plugin to mount [Pantheon](https://pantheon.io/) site environments.
 
-By default, the site environment will be mounted in `/tmp/site-name.dev`.
+By default, the site environment will be mounted in `/tmp/site-name.env`.
 
 If you want to mount in a different directory, use the `--dir=<directory>` option.
 
-Keep in mind, if you do mount in a different directory, you will also need to specific the same `--dir` option when unmounting.
+Keep in mind, if you do mount in a different directory, you will also need to specify the same `--dir` option when unmounting.
 
 ## Examples:
 Mount the site environment awesome-site.dev.
@@ -30,7 +30,7 @@ Executable mount, umount and sshfs commands must exist.
 
 ### Mac OSX:
 
-- Download the latest release of [osxfuse-x.x.x.dmg](https://github.com/osxfuse/osxfuse/releases).
+- Download and install the latest release of [osxfuse-x.x.x.dmg](https://github.com/osxfuse/osxfuse/releases).
 - Install sshfs via `brew install sshfs`
 
 ### Linux:
@@ -54,7 +54,7 @@ This plugin requires no configuration to use.
 
 Replace `my-test-site` with the site you want to test:
 ```
-TERMINUS_SITE=my-test-site
+export TERMINUS_SITE=my-test-site
 cd ~/.terminus/plugins/terminus-site-mount-plugin
 composer install
 composer test
