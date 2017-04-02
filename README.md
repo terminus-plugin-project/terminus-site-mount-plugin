@@ -5,11 +5,16 @@
 
 Terminus plugin to mount [Pantheon](https://pantheon.io/) site environments.
 
+## Usage:
+```
+terminus [site:]mount|[site:]u(n)mount site-name.env [--dir=<directory>]
+```
+
 By default, the site environment will be mounted in `/tmp/site-name.env`.
 
 If you want to mount in a different directory, use the `--dir=<directory>` option.
 
-Keep in mind, if you do mount in a different directory, you will also need to specify the same `--dir` option when unmounting.
+Keep in mind, if you mount in a different directory, you will also need to specify the same `--dir` option when unmounting.
 
 ## Examples:
 Mount the site environment awesome-site.dev.
