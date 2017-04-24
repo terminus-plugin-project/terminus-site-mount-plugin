@@ -11,10 +11,6 @@ use Pantheon\Terminus\Collections\Sites;
 // Get HOME directory.
 define('HOME', getenv('HOME'));
 
-// Is the operating system MS Windows?
-$windows = (php_uname('s') == 'Windows NT');
-define('WINDOWS', $windows);
-
 // Determine the default mount location.
 $temp_dir = WINDOWS ? '\\Temp' : '/tmp';
 define('TEMP_DIR', $temp_dir);
@@ -153,10 +149,11 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
     {
         // @TODO: This could be a generic utility function used by other commands.
 
-        $test_command = WINDOWS ? 'where' : 'command -v';
+        $windows = (php_uname('s') == 'Windows NT');
+        $test_command = $windows ? 'where' : 'command -v';
         $file = popen("$test_command $command", 'r');
         $result = fgets($file, 255);
-        return WINDOWS ? !preg_match('#Could not find files#', $result) : !empty($result);
+        return $windows ? !preg_match('#Could not find files#', $result) : !empty($result);
     }
 
     /**
@@ -164,6 +161,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
      */
     protected function checkRequirements()
     {
+        $windows = (php_uname('s') == 'Windows NT');
         if (!$this->commandExists('mount')) {
             $message = 'Please install the mount command to enable site mounts.';
             throw new TerminusNotFoundException($message);
@@ -173,7 +171,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
             throw new TerminusNotFoundException($message);
         }
         if (!$this->commandExists('sshfs')) {
-            $release = WINDOWS ? 'See https://linhost.info/2012/09/sshfs-in-windows/.' : 'See https://github.com/libfuse/sshfs/releases or install via your package manager.';
+            $release = $windows ? 'See https://linhost.info/2012/09/sshfs-in-windows/.' : 'See https://github.com/libfuse/sshfs/releases or install via your package manager.';
             $message = "Please install sshfs to enable site mounts.  {$release}";
             throw new TerminusNotFoundException($message);
         }
