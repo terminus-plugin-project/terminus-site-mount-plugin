@@ -12,7 +12,7 @@ use Pantheon\Terminus\Collections\Sites;
 define('HOME', getenv('HOME'));
 
 // Determine the default mount location.
-$temp_dir = WINDOWS ? '\\Temp' : '/tmp';
+$temp_dir = defined('WINDOWS') ? '\\Temp' : '/tmp';
 define('TEMP_DIR', $temp_dir);
 
 /**
