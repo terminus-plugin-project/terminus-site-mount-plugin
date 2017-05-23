@@ -9,11 +9,14 @@ use Pantheon\Terminus\Site\SiteAwareTrait;
 use Pantheon\Terminus\Collections\Sites;
 
 // Get HOME directory.
-define('HOME', getenv('HOME'));
+define('TERMINUS_SITE_MOUNT_HOME', getenv('HOME'));
+
+// Determine if the environment is Windows.
+define('TERMINUS_SITE_MOUNT_WINDOWS', (php_uname('s') == 'Windows NT'));
 
 // Determine the default mount location.
-$temp_dir = WINDOWS ? '\\Temp' : '/tmp';
-define('TEMP_DIR', $temp_dir);
+$temp_dir = TERMINUS_SITE_MOUNT_WINDOWS ? '\\Temp' : '/tmp';
+define('TERMINUS_SITE_MOUNT_TEMP_DIR', $temp_dir);
 
 /**
  * Class SiteMountCommand
@@ -37,7 +40,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
      *
      * @usage terminus site:mount <site>.<env>
      */
-    public function mount($site_env = '', $options = ['dir' => TEMP_DIR])
+    public function mount($site_env = '', $options = ['dir' => TERMINUS_SITE_MOUNT_TEMP_DIR])
     {
         $this->checkRequirements();
 
@@ -54,7 +57,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         $port = $connection_info['port'];
 
         // Determine the mount location.
-        $mount = str_replace('~', HOME, $options['dir']) . DIRECTORY_SEPARATOR . $site_env;
+        $mount = str_replace('~', TERMINUS_SITE_MOUNT_HOME, $options['dir']) . DIRECTORY_SEPARATOR . $site_env;
 
         // Create the mount directory if it doesn't exist.
         $command = "if [ ! -d \"{$mount}\" ]; then mkdir \"{$mount}\"; fi";
@@ -78,7 +81,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
 
         // Output mounted files location message.
         $unmount = 'terminus umount ';
-        $temp_mount_dir = TEMP_DIR . DIRECTORY_SEPARATOR . $site_env;
+        $temp_mount_dir = TERMINUS_SITE_MOUNT_TEMP_DIR . DIRECTORY_SEPARATOR . $site_env;
         $unmount .= ($mount == $temp_mount_dir) ? $site_env : $site_env . ' --dir=' . $options['dir'];
         $message = "Site mounted in '{$mount}' successfully.  Unmount with '{$unmount}'.";
         $this->log()->notice($message);
@@ -97,7 +100,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
      *
      * @usage terminus site:umount <site>.<env>
      */
-    public function unmount($site_env = '', $options = ['dir' => TEMP_DIR])
+    public function unmount($site_env = '', $options = ['dir' => TERMINUS_SITE_MOUNT_TEMP_DIR])
     {
         $this->checkRequirements();
 
@@ -107,7 +110,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
         }
 
         // Determine the mount location.
-        $mount = str_replace('~', HOME, $options['dir']) . DIRECTORY_SEPARATOR . $site_env;
+        $mount = str_replace('~', TERMINUS_SITE_MOUNT_HOME, $options['dir']) . DIRECTORY_SEPARATOR . $site_env;
 
         // Check if the directory exists.
         if (!file_exists("{$mount}")) {
@@ -149,8 +152,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
     {
         // @TODO: This could be a generic utility function used by other commands.
 
-        $windows = (php_uname('s') == 'Windows NT');
-        $test_command = $windows ? 'where' : 'command -v';
+        $test_command = TERMINUS_SITE_MOUNT_WINDOWS ? 'where' : 'command -v';
         $file = popen("$test_command $command", 'r');
         $result = fgets($file, 255);
         return $windows ? !preg_match('#Could not find files#', $result) : !empty($result);
@@ -161,7 +163,6 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
      */
     protected function checkRequirements()
     {
-        $windows = (php_uname('s') == 'Windows NT');
         if (!$this->commandExists('mount')) {
             $message = 'Please install the mount command to enable site mounts.';
             throw new TerminusNotFoundException($message);
@@ -171,7 +172,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
             throw new TerminusNotFoundException($message);
         }
         if (!$this->commandExists('sshfs')) {
-            $release = $windows ? 'See https://linhost.info/2012/09/sshfs-in-windows/.' : 'See https://github.com/libfuse/sshfs/releases or install via your package manager.';
+            $release = TERMINUS_SITE_MOUNT_WINDOWS ? 'See https://linhost.info/2012/09/sshfs-in-windows/.' : 'See https://github.com/libfuse/sshfs/releases or install via your package manager.';
             $message = "Please install sshfs to enable site mounts.  {$release}";
             throw new TerminusNotFoundException($message);
         }
