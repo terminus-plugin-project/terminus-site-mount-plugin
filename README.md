@@ -7,14 +7,18 @@ Terminus plugin to mount [Pantheon](https://pantheon.io/) site environments.
 
 ## Usage:
 ```
-terminus [site:]mount|[site:]u(n)mount site-name.env [--dir=<directory>]
+terminus [site:]mount|[site:]u(n)mount site-name.env [--dir=<directory> --drive=<drive letter>]
 ```
 
-By default, the site environment will be mounted in `/tmp/site-name.env`.
+By default, the site environment will be mounted in `$HOME/site-name.env` (Linux / Mac only).
 
 If you want to mount in a different directory, use the `--dir=<directory>` option.
 
 Keep in mind, if you mount in a different directory, you will also need to specify the same `--dir` option when unmounting.
+
+The `--drive=<drive letter>` option is only necessary on Windows.  The values can be 'first', 'last' or any available drive letter.
+
+The default is `--drive=first` which means the first available drive letter.
 
 ## Examples:
 Mount the site environment awesome-site.dev.
@@ -31,7 +35,7 @@ Learn more about [Terminus](https://pantheon.io/docs/terminus/) and [Terminus Pl
 
 ## Prerequisites:
 
-Executable mount, umount and sshfs commands must exist.
+Executable mount, umount and sshfs commands must exist (Linux / Mac only).
 
 ### Mac OSX:
 
@@ -42,6 +46,10 @@ Executable mount, umount and sshfs commands must exist.
 
 - Debian-based (Debian, Linux Mint, Ubuntu and derivatives): `sudo apt-get update && sudo apt-get install sshfs`
 - RedHat-based (RedHat, Fedora, CentOS and derivatives): `sudo yum install sshfs`
+
+### Windows:
+
+- Download and install [SFTP Net Drive 2017](http://www.sftpnetdrive.com/products/NDXCA/download).
 
 ## Installation:
 For installation help, see [Extend with Plugins](https://pantheon.io/docs/terminus/plugins/).
