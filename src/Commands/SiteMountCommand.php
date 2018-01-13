@@ -78,7 +78,7 @@ class SiteMountCommand extends TerminusCommand implements SiteAwareInterface
             }
 
             // Start the profile.
-            $command = "start \"\" /b \"{$sftp}\" start /profile:{$site_env} > nul 2> nul";
+            $command = "start \"\" \"{$sftp}\" start /profile:{$site_env} > nul 2> nul";
 
             // Set the message.
             $message = "Site mounted successfully.  Unmount with 'terminus umount {$site_env}'.";
