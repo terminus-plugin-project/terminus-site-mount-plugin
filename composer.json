@@ -22,7 +22,7 @@
     },
     "license": "MIT",
     "require": {
-        "php": "^5.5 || ^7.0"
+        "php": ">=5.5"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^2.7"
